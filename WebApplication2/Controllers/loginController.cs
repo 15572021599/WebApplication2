@@ -65,6 +65,35 @@ namespace WebApplication2.Controllers
             return JsonConvert.SerializeObject(false);
         }
 
+        [HttpGet]
+        [Route("aaa")]
+        [AllowAnonymous]//取消授权
+        public async Task<object> aaa(string name, string password)
+        {
+            Model.USERS list = await db.Select<Model.USERS>().Where(e => e.USERNAME == name && e.PASSWORD == password).FirstAsync();
+            if (list != null)
+            {
+                string token;
+                if (auth.IsAuthenticated(list, out token))
+                {
+                    // 判断用户角色
+                    string role = list.ROLE;
+                    var result = new
+                    {
+                        token = token,
+                        role = role
+                    };
+                    return JsonConvert.SerializeObject(result);
+                }
+                else
+                {
+                    return JsonConvert.SerializeObject(1);
+                }
+
+            }
+            return JsonConvert.SerializeObject(false);
+        }
+
         /// <summary>
         /// 获取销售订单信息
         /// </summary>
